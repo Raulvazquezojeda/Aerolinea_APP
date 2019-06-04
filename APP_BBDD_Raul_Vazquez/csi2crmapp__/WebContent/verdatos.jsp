@@ -1,56 +1,14 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@page import="mipk.beanDB"%>
-<%@page import="java.sql.SQLException"%>
-
+<%@page import="objetoscrm.*"%>
 <%
 try {
 	String aux=session.getAttribute("usuario").toString();
 } catch (Exception e) {
 	response.sendRedirect("cerrarsesion.jsp");
 }
-
-
-beanDB db = new beanDB();
-boolean okdb = false;
-String resultado = "";
-
-try {
-	db.conectarBD();
-	okdb = true;
-} catch (Exception e) {
-	e.printStackTrace();
-}
-if (okdb) {
-/* 	String opcion=request.getParameter(tabla);
-	 switch(opcion){
-	 
-	 } */
-	String query="select id_cliente, nombre, apellidos from clientes";
-	String [][] tablares = null;
-	try {
-		tablares = db.resConsultaSelectA3(query);
-	} catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	if (tablares != null) {
-		
-		resultado = "<table class=table table-striped table-dark style=background-color=#475d62>";
-		for (int i=0; i<tablares.length;i++) { //g es una variable tipo grupo que va recorriendo la lista
-			resultado += "<tr>";
-			resultado += "<td>" + tablares[i][0] + "</td>";
-			resultado += "<td>" + tablares[i][1] + "</td>";
-			resultado += "<td>" + tablares[i][2] + "</td>";
-			resultado += "</tr>";
-		}
-		resultado += "</table>";
-		
-	}
-	db.desconectarBD();
-}
-else resultado = "No se pudo conectar con la BBDD.";
-
 
 %>
 <html>
@@ -140,6 +98,15 @@ else resultado = "No se pudo conectar con la BBDD.";
 </style>
 </head>
 <body style="background-color:#1e2833; color:#fff;">
+<%
+String idCliente = request.getParameter("nombre");
+String nombre;
+String query1="select nombre, apellidos from clientes where id_cliente=" + idCliente;
+beanDB basededatos = new beanDB();
+String [][] tablares1 = basededatos.resConsultaSelectA3(query1);
+nombre = tablares1[0][0] + " " + tablares1[0][1];
+
+%>
 <h1><%=session.getAttribute("usuario") %>: Estos son los datos</h1>
 <hr/>
 <div class="login-dark" style=" height:30%;">
@@ -148,12 +115,41 @@ else resultado = "No se pudo conectar con la BBDD.";
 <p><a class="btn btn-primary btn-block" href="cerrarsesion.jsp">Salir</a></p>
 </form>
 </div>
-
-
+<% 
+try{
+String query="select tabla1.id_cli_has_vuelos, ciudad_origen, ciudad_destino from (select clientes_id, id_cli_has_vuelos, ciudad ciudad_origen from cli_has_vuelos join vuelos on (cli_has_vuelos.vuelos_id=vuelos.id_vuelo) join aeropuerto on(vuelos.origen_id=aeropuerto.id_aeropuerto)) tabla1 join (select id_cli_has_vuelos, ciudad ciudad_destino from cli_has_vuelos join vuelos on (cli_has_vuelos.vuelos_id=vuelos.id_vuelo) join aeropuerto on(vuelos.destino_id=aeropuerto.id_aeropuerto)) tabla2 on(tabla2.id_cli_has_vuelos=tabla1.id_cli_has_vuelos) where clientes_id=" + idCliente;
+String [][] tablares = basededatos.resConsultaSelectA3(query);
+%>
 <hr/>
-<%=resultado %>
-<div id="contenedor1">
-</div>
+<table id="uno" class="table">
+<%
+	%>
+	  <thead class="thead-dark">
+		<tr>
+	 		<th scope="col">id Compra</th>
+			<th scope="col">Cuidad Origen</th>
+	 		<th scope="col">Cuidad Destino</th>
+		</tr>
+	</thead>
+	<%
+	for(int i = 0; i < tablares.length; i++) {
+		%>
+		<tr>
+	 		<td> <%= tablares[i][0] %> </td>
+	 		<td> <%= tablares[i][1] %> </td>
+	 		<td> <%= tablares[i][2] %> </td>
+	 	</tr> <% 	 
+	}
+%>
+</table>
+<%
+}
+catch (NullPointerException e){
+	%>
+	<p>Este Cliente no ha comprado ningun vuelo todavia.<p>
+<%
+}
+%>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script> 
 </body></html>

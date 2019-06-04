@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+        <%@page import="mipk.beanDB"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
 <head>
@@ -28,7 +29,7 @@ try {
 }
 
 .login-dark form {
-  max-width:320px;
+  max-width:355px;
   width:90%;
   background-color:#1e2833;
   padding:40px;
@@ -49,6 +50,7 @@ try {
 }
 
 .login-dark form .form-control {
+	height:50%;
   background:none;
   border:none;
   border-bottom:1px solid #434a52;
@@ -102,23 +104,12 @@ try {
 <body class="login-dark">
 <% if (ok) { %>
 <div>
+
 <form>
 <h1>Bienvenido <%=session.getAttribute("usuario") %></h1>
 Sesión iniciada
 <hr/>
-<!-- <div class="form-group">
-   <select class="custom-select" required name="modo" id="modo">
-      <option value="">Seleccion tabla</option>
-      <option value="fill">Aeropuerto</option>
-      <option value="stroke">Clientes</option>
-      <option value="stroke">Aviones</option>
-      <option value="stroke">Cli_has_vuelos</option>
-      <option value="stroke">Empleados</option>
-      <option value="stroke">Vuelos</option>
-   </select>
-</div> -->
-<a class="btn btn-primary btn-block" href="verdatos.jsp">Acceder a los Datos</a>
-<a class="btn btn-primary btn-block" href="insertdatos.jsp">Insertar Datos</a>
+<a style="margin-top:80%;" class="btn btn-primary btn-block" href="insertdatos.jsp">Insertar Datos</a>
 <p><a class="btn btn-primary btn-block" href="updatedatos.jsp">Modificar Datos</a></p>
 <a class="btn btn-primary btn-block"  href="cerrarsesion.jsp">Salir</a>
 <% } else { 
@@ -129,6 +120,28 @@ Por favor, inténtelo de nuevo.<br/>
 <% } %>
 </form>
 </div>
+<form action="./verdatos.jsp" method="post">
+Seleccione un nombre: 
+<select name="nombre">
+  <%
+				beanDB basededatos1 = new beanDB();
+				String query1 = "select id_cliente, nombre, apellidos from clientes";
+				String[][] tablares = basededatos1.resConsultaSelectA3(query1);
+					for (int i = 0; i < tablares.length; i++) {
+			%>
+			<option value="<%=tablares[i][0]%>"><%=tablares[i][1] + " " + tablares[i][2]%>
+				<%
+					}
+				%>
+</select>
+<input class="btn btn-success" type="submit" name="send" value="Mostrar">
+</form>
+
+<%
+String query="select id_cliente, nombre, apellidos, DNI from clientes";
+beanDB basededatos = new beanDB();
+String [][] tablares1 = basededatos.resConsultaSelectA3(query);
+%>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script> 
 </body>
